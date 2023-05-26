@@ -6,7 +6,7 @@ import math
 import time
 
 
-cap = cv2.VideoCapture('http://100.86.189.6:8080/video')
+cap = cv2.VideoCapture('http://100.86.147.26:8080/video')
 detector=HandDetector(maxHands=1)
 classifier=Classifier("model/keras_model.h5","model/labels.txt")
 offset=20
@@ -16,6 +16,7 @@ counter=0
 labels=["A","B","C"]
 while(cap.isOpened()):
     ret,frame=cap.read()
+    imgOutput=frame.copy()
     hands,img=detector.findHands(frame)
     if hands:
         hand=hands[0]
@@ -35,8 +36,9 @@ while(cap.isOpened()):
             imgResizeShape=imgResize.shape
             wGap=math.ceil((imgSize-wCal)/2)
             imgWhite[:,wGap:wCal+wGap]=imgResize
-            prediction,index=classifier.getPrediction(frame)
+            prediction,index=classifier.getPrediction(imgWhite)
             print(prediction,index)
+
 
         else:
             k=imgSize/w
@@ -45,9 +47,14 @@ while(cap.isOpened()):
             imgResizeShape=imgResize.shape
             hGap=math.ceil((imgSize-hCal)/2)
             imgWhite[hGap:hCal+hGap,:]=imgResize
+            prediction,index=classifier.getPrediction(imgWhite)
+
+        cv2.putText(imgOutput,labels[index],(x,y-20),cv2.FONT_HERSHEY_COMPLEX,2,(255,0,255),2)
             
         cv2.imshow("ImageCrop",imgCrop)
         cv2.imshow("ImageWhite",imgWhite)
+
+        cv2.imshow("Image",imgOutput)
      
     try:
         cv2.imshow('temp',cv2.resize(frame, (600,400)))

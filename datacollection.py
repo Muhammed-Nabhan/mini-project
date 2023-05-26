@@ -5,7 +5,7 @@ import math
 import time
 
 
-cap = cv2.VideoCapture('http://100.86.189.6:8080/video')
+cap = cv2.VideoCapture('http://100.86.147.26:8080/video')
 detector=HandDetector(maxHands=1)
 offset=20
 imgSize=300
