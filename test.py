@@ -9,7 +9,7 @@ import time
 app = Flask(__name__)
 
 
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(1)
 detector=HandDetector(maxHands=1)
 classifier=Classifier("model/keras_model.h5","model/labels.txt")
 offset=20
