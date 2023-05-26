@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <Title>
+            MINI PROJECT
+        </Title>
+    </head>
+    <body>
+        <img id="video-stream" src="{{ url_for('video_feed')}}" width="640" height="480">
+        <script>
+            setInterval(function(){
+                var img = document.getElementById('video-stream');
+                img.src="{{ url_for('video_feed')}}"+"?"+ new Date().getTime();
+            },1000);
+        </script>
+    </body>
+</html>
