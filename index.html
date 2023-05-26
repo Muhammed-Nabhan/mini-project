@@ -6,12 +6,53 @@
         </Title>
     </head>
     <body>
-        <img id="video-stream" src="{{ url_for('video_feed')}}" width="640" height="480">
+        <h1>Sign Translator</h1>
+        <video id="video" width="640" height="480" autoplay></video>
+        <canvas id="canvas" style="display: none"></canvas> 
         <script>
-            setInterval(function(){
-                var img = document.getElementById('video-stream');
-                img.src="{{ url_for('video_feed')}}"+"?"+ new Date().getTime();
-            },1000);
+           document.addEventListener("DOMContentLoaded",() =>{
+            const video=document.getElementById("video");
+            const canvas=document.getElementById("canvas");
+            const context=document.getElementById("2d");
+            if(navigator.mediaDevices &&navigator.mediaDevices.getUserMedia){
+                navigator.mediaDevices.getUserMedia({video:true})
+                    .then((stream) => {
+                        video.srcObject = stream;
+                    })
+                    .catch((error) => {
+                        console.error("Error accessing the camera:",error);
+                    });
+                
+            }
+
+            function sendVideoFrame(){
+                context.drawImage(video,0,0,canvas.width,canvas.height);
+                const imageData=canvas.toDataURL("image/jpeg");
+
+                fetch('/process_image',{
+                    method:'POST',
+                    headers:{
+                        'Content-Type':'application/json'
+                    },
+                    body:JSON.stringify({image:imageData})
+                })
+                .then((response) => response.json())
+                .then((data) =>{
+                    const prediction=data.prediction;
+                    console.log("Prediction:",prediction);
+
+                    const processedImage=document.createElement("img");
+                    processedImage.src=data.image_data;
+                    document.body.appendChild(processedImage);
+                    requestAnimationFrame(sendVideoFrame);
+                })
+                .catch((error) =>{
+                    console.error("Error processing image:",error);
+
+                });
+            }
+            sendVideoFrame();
+           });
         </script>
     </body>
 </html>
